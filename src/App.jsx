@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Check, Package, DollarSign, Users, Trash2, Download, Calendar, MapPin, ChevronDown, ChevronUp, Plus, X, Pencil, ArrowDownUp, ChevronsUpDown, List, GanttChart } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Check, Package, DollarSign, Users, Trash2, Download, Calendar, MapPin, ChevronDown, ChevronUp, Plus, X, Pencil, ArrowDownUp, ChevronsUpDown, List, GanttChart, RotateCcw } from 'lucide-react';
 
 const initialTasks = [
   // HIRE category
@@ -57,7 +57,11 @@ const priorityColors = {
 };
 
 export default function App() {
-  const [tasks, setTasks] = useState(initialTasks);
+  // Load tasks from localStorage, or use defaults if none saved
+  const [tasks, setTasks] = useState(() => {
+    const saved = localStorage.getItem('movingPlannerTasks');
+    return saved ? JSON.parse(saved) : initialTasks;
+  });
   const [expandedCategories, setExpandedCategories] = useState(
     Object.keys(categoryConfig).reduce((acc, key) => ({ ...acc, [key]: true }), {})
   );
@@ -75,6 +79,18 @@ export default function App() {
     priority: 'medium',
     notes: ''
   });
+
+  // Save tasks to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('movingPlannerTasks', JSON.stringify(tasks));
+  }, [tasks]);
+
+  // Reset to default tasks
+  const resetTasks = () => {
+    if (window.confirm('Reset all tasks to defaults? This will erase your changes.')) {
+      setTasks(initialTasks);
+    }
+  };
 
   const toggleTask = (id) => {
     setTasks(tasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
@@ -361,13 +377,17 @@ export default function App() {
                   onChange={(e) => setFilter(e.target.value)}
                   style={{
                     fontFamily: '"DM Sans", sans-serif',
-                    padding: '10px 16px',
+                    padding: '10px 36px 10px 16px',
                     borderRadius: '8px',
                     border: '1px solid #DDD',
                     background: 'white',
                     fontSize: '14px',
                     cursor: 'pointer',
-                    color: '#2C3E50'
+                    color: '#2C3E50',
+                    appearance: 'none',
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
+                    backgroundRepeat: 'no-repeat',
+                    backgroundPosition: 'right 12px center'
                   }}
                 >
                   <option value="all">All Categories</option>
@@ -441,6 +461,28 @@ export default function App() {
             >
               <Download size={16} />
               Export CSV
+            </button>
+            <button 
+              onClick={resetTasks}
+              className="export-btn"
+              style={{
+                fontFamily: '"DM Sans", sans-serif',
+                padding: '10px 20px',
+                borderRadius: '8px',
+                border: '1px solid #DDD',
+                background: 'white',
+                color: '#888',
+                fontSize: '14px',
+                fontWeight: '500',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              <RotateCcw size={16} />
+              Reset
             </button>
           </div>
         </div>
