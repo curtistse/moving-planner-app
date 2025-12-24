@@ -5,5 +5,5 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   // IMPORTANT: Change 'moving-planner' to your GitHub repo name
-  base: '/moving-planner/',
+  base: '/moving-planner-app/',
 })
